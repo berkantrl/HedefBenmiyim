@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hedef Ben Miyim? — APT Tehdit İstihbaratı</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="apple-touch-icon" href="favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #ffffff;
+  --bg2:       #f7f7f5;
+  --bg3:       #f0efeb;
+  --border:    #e5e4e0;
+  --border2:   #d4d3cf;
+  --text:      #1a1a18;
+  --text2:     #6b6b67;
+  --text3:     #9b9b97;
+  --accent:    #c0392b;
+  --accent2:   #e74c3c;
+  --accent-bg: #fdf2f1;
+  --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
+  --radius:    8px;
+  --font:      'DM Sans', sans-serif;
+  --mono:      'DM Mono', monospace;
+  --high-color:   #16a34a;
+  --high-bg:      #f0fdf4;
+  --high-border:  #bbf7d0;
+  --med-color:    #d97706;
+  --med-bg:       #fffbeb;
+  --med-border:   #fde68a;
+  --low-color:    #6b7280;
+  --low-bg:       #f9fafb;
+  --low-border:   #e5e7eb;
+}
+
+[data-theme="dark"] {
+  --bg:        #0f0f0d;
+  --bg2:       #1a1a17;
+  --bg3:       #222220;
+  --border:    #2a2a27;
+  --border2:   #3a3a37;
+  --text:      #f0efe8;
+  --text2:     #9b9b94;
+  --text3:     #6b6b64;
+  --accent:    #e74c3c;
+  --accent2:   #ff6b5b;
+  --accent-bg: #1f1412;
+  --shadow:    0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --high-color:   #4ade80;
+  --high-bg:      #052e16;
+  --high-border:  #166534;
+  --med-color:    #fbbf24;
+  --med-bg:       #1c1008;
+  --med-border:   #92400e;
+  --low-color:    #9ca3af;
+  --low-bg:       #111827;
+  --low-border:   #374151;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
+}
+
+/* ── NAV ─────────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+
+.nav-links { display: flex; gap: 4px; }
+
+.nav-link {
+  padding: 6px 14px; border-radius: 6px;
+  font-size: 0.875rem; font-weight: 500;
+  color: var(--text2); cursor: pointer; border: none;
+  background: transparent;
+  transition: all 0.15s; text-decoration: none;
+}
+.nav-link:hover { background: var(--bg2); color: var(--text); }
+.nav-link.active { background: var(--bg2); color: var(--text); font-weight: 600; }
+
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.lang-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg); color: var(--text2);
+  font-family: var(--font); font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; letter-spacing: 0.3px;
+}
+.lang-btn:hover { border-color: var(--border2); color: var(--text); }
+
+/* Dark mode toggle */
+.theme-toggle {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.75rem; color: var(--text3); cursor: pointer;
+}
+.toggle-track {
+  width: 40px; height: 22px; border-radius: 11px;
+  background: var(--border2); position: relative;
+  cursor: pointer; transition: background 0.25s;
+  border: none; outline: none; flex-shrink: 0;
+}
+.toggle-track.on { background: var(--text); }
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: white; transition: transform 0.25s;
+  pointer-events: none;
+}
+.toggle-track.on .toggle-thumb { transform: translateX(18px); }
+
+/* ── PAGES ───────────────────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── HOME PAGE ───────────────────────────────────────── */
+.home {
+  min-height: calc(100vh - 60px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.home-inner { width: 100%; max-width: 480px; text-align: center; }
+
+.home-image {
+  width: 220px; height: 220px;
+  object-fit: contain; object-position: bottom;
+  margin: 0 auto 2rem;
+  display: block;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12));
+  transition: transform 0.3s;
+}
+.home-image:hover { transform: scale(1.03) translateY(-4px); }
+
+.home-title {
+  font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px;
+  color: var(--text); margin-bottom: 0.4rem;
+}
+.home-sub {
+  font-size: 0.9rem; color: var(--text3); margin-bottom: 2rem;
+}
+
+/* Select fields */
+.select-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem; }
+
+.select-wrap { position: relative; }
+.select-label {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px;
+  text-transform: uppercase; color: var(--text3);
+  display: block; margin-bottom: 5px; text-align: left;
+}
+.field-select {
+  width: 100%; padding: 10px 36px 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font); font-size: 0.9rem;
+  appearance: none; -webkit-appearance: none;
+  cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field-select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+}
+.select-chevron {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%); pointer-events: none;
+  color: var(--text3); font-size: 0.7rem;
+}
+
+/* Search button */
+.search-btn {
+  width: 100%; padding: 12px;
+  background: #2563eb; color: white;
+  border: none; border-radius: var(--radius);
+  font-family: var(--font); font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  margin-top: 6px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.search-btn:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+.search-btn:active { transform: translateY(0); }
+
+/* ── RESULTS ─────────────────────────────────────────── */
+.results-section {
+  max-width: 900px; margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.results-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px;
+}
+.results-count {
+  font-size: 0.85rem; color: var(--text2);
+}
+.results-count strong { color: var(--text); }
+
+.export-results-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg); color: var(--text2);
+  font-family: var(--font); font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+}
+.export-results-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* APT Cards */
+.apt-list { display: flex; flex-direction: column; gap: 12px; }
+
+.apt-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  animation: fadeUp 0.3s both;
+}
+.apt-card:hover { box-shadow: var(--shadow); border-color: var(--border2); }
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.apt-card-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 0.75rem; gap: 12px;
+}
+.apt-card-name { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.apt-card-alias { font-size: 0.78rem; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
+
+.threat-badge {
+  padding: 3px 8px; border-radius: 4px; font-size: 0.7rem;
+  font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0;
+}
+.threat-CRITICAL { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.threat-HIGH     { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.threat-MEDIUM   { background: #fefce8; color: #a16207; border: 1px solid #fef08a; }
+[data-theme="dark"] .threat-CRITICAL { background: #1f0a0a; color: #f87171; border-color: #7f1d1d; }
+[data-theme="dark"] .threat-HIGH     { background: #1c0f05; color: #fb923c; border-color: #7c2d12; }
+[data-theme="dark"] .threat-MEDIUM   { background: #1c1a05; color: #facc15; border-color: #713f12; }
+
+.apt-card-desc {
+  font-size: 0.84rem; color: var(--text2); line-height: 1.6;
+  margin-bottom: 0.875rem;
+}
+
+.apt-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.75rem; }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg2); color: var(--text2);
+}
+.tag.origin { border-color: #fed7aa; background: #fff7ed; color: #c2410c; }
+.tag.sector { border-color: #bbf7d0; background: #f0fdf4; color: #16a34a; }
+[data-theme="dark"] .tag.origin { border-color: #7c2d12; background: #1c0f05; color: #fb923c; }
+[data-theme="dark"] .tag.sector { border-color: #166534; background: #052e16; color: #4ade80; }
+
+.apt-techniques {
+  margin-bottom: 0.75rem;
+}
+.techniques-label {
+  font-size: 0.7rem; color: var(--text3); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.technique-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.technique-pill {
+  font-family: var(--mono); font-size: 0.68rem;
+  padding: 2px 6px; border-radius: 3px;
+  background: var(--bg3); color: var(--text2);
+  border: 1px solid var(--border);
+}
+
+.apt-card-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 0.75rem; border-top: 1px solid var(--border);
+  flex-wrap: wrap; gap: 8px;
+}
+.apt-ioc-count { font-size: 0.78rem; color: var(--text3); }
+.apt-ioc-count strong { color: var(--accent); }
+
+.apt-mitre-link {
+  font-size: 0.75rem; color: var(--text3);
+  text-decoration: none; display: flex; align-items: center; gap: 4px;
+  transition: color 0.15s;
+}
+.apt-mitre-link:hover { color: var(--accent); }
+
+/* ── IOC PAGE ────────────────────────────────────────── */
+.ioc-page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+.page-header { margin-bottom: 1.5rem; }
+.page-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; }
+.page-sub { font-size: 0.85rem; color: var(--text3); }
+
+/* Confidence legend */
+.conf-legend {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.conf-legend-title {
+  width: 100%; font-size: 0.72rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text3); margin-bottom: 4px;
+}
+.conf-item { display: flex; align-items: center; gap: 6px; }
+.conf-badge {
+  padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700;
+  border: 1px solid;
+}
+.conf-high   { background: var(--high-bg);  color: var(--high-color); border-color: var(--high-border); }
+.conf-medium { background: var(--med-bg);   color: var(--med-color);  border-color: var(--med-border); }
+.conf-low    { background: var(--low-bg);   color: var(--low-color);  border-color: var(--low-border); }
+.conf-desc   { font-size: 0.78rem; color: var(--text2); }
+
+/* Filters */
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 1rem; align-items: flex-end;
+}
+.filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 160px; flex: 1; }
+.filter-label {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.5px;
+  text-transform: uppercase; color: var(--text3);
+}
+.filter-select {
+  padding: 8px 30px 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px; background: var(--bg);
+  color: var(--text); font-family: var(--font); font-size: 0.84rem;
+  appearance: none; -webkit-appearance: none; cursor: pointer;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.filter-select:focus { outline: none; border-color: var(--accent); }
+.filter-search {
+  padding: 8px 10px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); font-size: 0.84rem;
+  width: 100%; transition: border-color 0.15s;
+}
+.filter-search:focus { outline: none; border-color: var(--accent); }
+.filter-search::placeholder { color: var(--text3); }
+
+.filter-actions {
+  display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 6px;
+  font-family: var(--font); font-size: 0.82rem; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; border: 1px solid;
+}
+.btn-outline {
+  background: var(--bg); color: var(--text2);
+  border-color: var(--border);
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-primary-red {
+  background: #dc2626; color: white; border-color: #dc2626;
+}
+.btn-primary-red:hover { background: #b91c1c; }
+.btn-primary-blue {
+  background: #2563eb; color: white; border-color: #2563eb;
+}
+.btn-primary-blue:hover { background: #1d4ed8; }
+
+/* IOC Table */
+.ioc-stats-bar {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.ioc-stat {
+  font-size: 0.78rem; color: var(--text3);
+}
+.ioc-stat strong { color: var(--text); font-weight: 600; }
+
+.ioc-table-wrap {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; overflow-x: auto;
+}
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+thead tr { background: var(--bg2); border-bottom: 1px solid var(--border); }
+th {
+  padding: 10px 12px; text-align: left;
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text3); white-space: nowrap;
+}
+td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--bg2); }
+
+.ioc-value {
+  font-family: var(--mono); font-size: 0.78rem;
+  color: var(--text); word-break: break-all; max-width: 280px;
+}
+.ioc-type-badge {
+  display: inline-block; padding: 2px 7px;
+  border-radius: 3px; font-size: 0.68rem; font-weight: 700;
+  font-family: var(--mono); white-space: nowrap;
+  border: 1px solid;
+}
+.type-ip     { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+.type-domain { background:#f0fdf4; color:#16a34a; border-color:#bbf7d0; }
+.type-sha256 { background:#fefce8; color:#a16207; border-color:#fef08a; }
+.type-sha1   { background:#fff7ed; color:#c2410c; border-color:#fed7aa; }
+.type-md5    { background:#fdf4ff; color:#9333ea; border-color:#e9d5ff; }
+.type-url    { background:#fff1f2; color:#e11d48; border-color:#fecdd3; }
+[data-theme="dark"] .type-ip     { background:#172554; color:#93c5fd; border-color:#1e3a8a; }
+[data-theme="dark"] .type-domain { background:#052e16; color:#4ade80; border-color:#166534; }
+[data-theme="dark"] .type-sha256 { background:#1c1a05; color:#facc15; border-color:#713f12; }
+[data-theme="dark"] .type-sha1   { background:#1c0f05; color:#fb923c; border-color:#7c2d12; }
+[data-theme="dark"] .type-md5    { background:#1a0533; color:#c084fc; border-color:#581c87; }
+[data-theme="dark"] .type-url    { background:#1f0a10; color:#fb7185; border-color:#881337; }
+
+.copy-btn {
+  background: none; border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 8px;
+  font-family: var(--mono); font-size: 0.65rem; color: var(--text3);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--high-border); color: var(--high-color); }
+
+.ioc-apt { font-size: 0.75rem; color: var(--text2); }
+.no-results {
+  text-align: center; padding: 3rem 1rem; color: var(--text3);
+  font-size: 0.875rem;
+}
+
+/* Pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 1rem; flex-wrap: wrap; gap: 10px;
+}
+.pagination-info { font-size: 0.78rem; color: var(--text3); }
+.pagination-btns { display: flex; gap: 4px; }
+.pag-btn {
+  padding: 5px 10px; border: 1px solid var(--border);
+  border-radius: 5px; background: var(--bg); color: var(--text2);
+  font-family: var(--font); font-size: 0.78rem; cursor: pointer;
+  transition: all 0.15s;
+}
+.pag-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pag-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+.pag-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 5rem 2rem;
+}
+.empty-img { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+.empty-title { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+.empty-sub { font-size: 0.85rem; color: var(--text3); }
+
+/* Loading */
+.loading {
+  text-align: center; padding: 3rem;
+  color: var(--text3); font-size: 0.875rem;
+}
+
+
+/* ── FOOTER ─────────────────────────────────────────── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+  background: var(--bg); transition: background 0.3s, border-color 0.3s;
+  flex-wrap: wrap;
+}
+.footer-dev {
+  font-size: 0.78rem; color: var(--text3);
+  display: flex; align-items: center; gap: 6px;
+}
+.footer-dev strong { color: var(--text2); font-weight: 600; }
+.footer-links { display: flex; gap: 10px; align-items: center; }
+.footer-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 5px;
+  font-size: 0.75rem; font-weight: 500; text-decoration: none;
+  color: var(--text3); border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.footer-link:hover { color: var(--text); border-color: var(--border2); }
+.footer-link svg { width:13px; height:13px; flex-shrink:0; }
+
+/* Loading bar */
+#data-loader {
+  position: fixed; bottom: 16px; right: 16px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 0.78rem; color: var(--text2);
+  box-shadow: var(--shadow-lg); z-index: 999;
+  display: flex; align-items: center; gap: 8px;
+}
+.loader-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); animation: pulse 1s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* Responsive */
+@media (max-width: 640px) {
+  nav { padding: 0 1rem; }
+  .home { padding: 2rem 1rem; }
+  .filter-bar { flex-direction: column; }
+  .filter-group { min-width: unset; }
+  table { font-size: 0.75rem; }
+  th, td { padding: 7px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home', this)">Hedef Ben Miyim?</button>
+    <button class="nav-link" onclick="showPage('ioc', this)">IOC Veritabanı</button>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">
+      <span id="langIcon">🇬🇧</span> EN
+    </button>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <button class="toggle-track" id="themeTrack">
+        <div class="toggle-thumb"></div>
+      </button>
+      <span id="themeLabel">Dark</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <!-- Hero -->
+  <div class="home" id="home-hero">
+    <div class="home-inner">
+      <img src="safak_abi.png" alt="Hedef Ben Miyim" class="home-image" id="heroImg">
+      <h1 class="home-title">Hedef Ben Miyim?</h1>
+      <p class="home-sub">Sektörünü ve ülkeni seç, seni hedef alan APT gruplarını öğren.</p>
+
+      <div class="select-group">
+        <div class="select-wrap">
+          <label class="select-label">Ülke</label>
+          <select class="field-select" id="sel-country">
+            <option value="">— Ülke Seçin —</option>
+          </select>
+          <span class="select-chevron">▼</span>
+        </div>
+        <div class="select-wrap">
+          <label class="select-label">Sektör</label>
+          <select class="field-select" id="sel-sector">
+            <option value="">— Sektör Seçin —</option>
+          </select>
+          <span class="select-chevron">▼</span>
+        </div>
+      </div>
+
+      <button class="search-btn" onclick="runSearch()">
+        Hedef Ben Miyim, Tayfun?
+      </button>
+    </div>
+  </div>
+
+  <!-- Results (hidden initially) -->
+  <div class="results-section" id="results-section" style="display:none">
+    <div class="results-bar">
+      <div class="results-count" id="results-count"></div>
+      <button class="export-results-btn" onclick="exportResultsIOC()">
+        ↓ Hedef IOC'larını Dışa Aktar
+      </button>
+    </div>
+    <div class="apt-list" id="apt-list"></div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty-state" style="display:none" class="results-section">
+    <div class="empty-state">
+      <div class="empty-img">🛡️</div>
+      <div class="empty-title" id="empty-title">Eşleşen tehdit grubu bulunamadı</div>
+      <div class="empty-sub" id="empty-sub">Bu ülke ve sektör kombinasyonu için kayıtlı APT grubu yok.</div>
+    </div>
+  </div>
+</div>
+
+<!-- IOC PAGE -->
+<div id="page-ioc" class="page">
+  <div class="ioc-page">
+    <div class="page-header">
+      <h1 class="page-title">IOC Veritabanı</h1>
+      <p class="page-sub">Bilinen APT gruplarına ait göstergeler — IP, domain, hash değerleri</p>
+    </div>
+
+    <!-- Confidence legend -->
+    <div class="conf-legend">
+      <div class="conf-legend-title" id="conf-legend-title">Güvenilirlik Seviyeleri</div>
+      <div class="conf-item">
+        <span class="conf-badge conf-high" id="badge-high">YÜKSEK</span>
+        <span class="conf-desc">FireEye/Mandiant, Kaspersky, Palo Alto Unit42 gibi kurumsal kaynaklardan doğrulanmış IOC'ler</span>
+      </div>
+      <div class="conf-item">
+        <span class="conf-badge conf-medium" id="badge-medium">ORTA</span>
+        <span class="conf-desc">Topluluk tarafından paylaşılan, doğrulanmış güvenlik araştırmacı repolarından alınan IOC'ler</span>
+      </div>
+      <div class="conf-item">
+        <span class="conf-badge conf-low" id="badge-low">DÜŞÜK</span>
+        <span class="conf-desc">Otomatik feed'lerden veya doğrulanmamış kaynaklardan gelen IOC'ler</span>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label class="filter-label">IOC Türü</label>
+        <div style="position:relative">
+          <select class="filter-select" id="f-type" onchange="applyFilters()">
+            <option value="" id="fopt-all-type">Tümü</option>
+            <option value="ip" id="fopt-ip">IP Adresi</option>
+            <option value="domain">Domain</option>
+            <option value="sha256">SHA256</option>
+            <option value="sha1">SHA1</option>
+            <option value="md5">MD5</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">APT Grubu</label>
+        <div style="position:relative">
+          <select class="filter-select" id="f-apt" onchange="applyFilters()">
+            <option value="">Tümü</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Güvenilirlik</label>
+        <div style="position:relative">
+          <select class="filter-select" id="f-conf" onchange="applyFilters()">
+            <option value="" id="fopt-all-conf">Tümü</option>
+            <option value="high" id="fopt-high">Yüksek</option>
+            <option value="medium" id="fopt-med">Orta</option>
+            <option value="low" id="fopt-low">Düşük</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-group" style="flex:2;min-width:200px">
+        <label class="filter-label">Değer Ara</label>
+        <input class="filter-search" id="f-search" type="text"
+          placeholder="IP, domain veya hash ara..." oninput="applyFilters()">
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-outline" onclick="resetFilters()">Sıfırla</button>
+        <button class="btn btn-primary-red" onclick="exportIOC('txt')">↓ TXT</button>
+        <button class="btn btn-primary-blue" onclick="exportIOC('csv')">↓ CSV</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="ioc-stats-bar" id="ioc-stats"></div>
+
+    <!-- Table -->
+    <div class="ioc-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th id="th-type">Tür</th>
+            <th id="th-value">Değer</th>
+            <th id="th-apt">APT Grubu</th>
+            <th id="th-conf">Güvenilirlik</th>
+            <th id="th-source">Kaynak</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ioc-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// TRANSLATIONS
+// ════════════════════════════════════════════════════════
+const COUNTRY_TR = {
+  "Afghanistan":"Afganistan","Albania":"Arnavutluk","Algeria":"Cezayir",
+  "Angola":"Angola","Argentina":"Arjantin","Armenia":"Ermenistan",
+  "Australia":"Avustralya","Austria":"Avusturya","Azerbaijan":"Azerbaycan",
+  "Bahrain":"Bahreyn","Bangladesh":"Bangladeş","Belarus":"Belarus",
+  "Belgium":"Belçika","Bolivia":"Bolivya","Bosnia and Herzegovina":"Bosna-Hersek",
+  "Brazil":"Brezilya","Bulgaria":"Bulgaristan","Cambodia":"Kamboçya",
+  "Canada":"Kanada","Chile":"Şili","China":"Çin","Colombia":"Kolombiya",
+  "Croatia":"Hırvatistan","Cuba":"Küba","Cyprus":"Kıbrıs",
+  "Czech Republic":"Çek Cumhuriyeti","Denmark":"Danimarka","Ecuador":"Ekvador",
+  "Egypt":"Mısır","Estonia":"Estonya","Ethiopia":"Etiyopya",
+  "Finland":"Finlandiya","France":"Fransa","Georgia":"Gürcistan",
+  "Germany":"Almanya","Ghana":"Gana","Greece":"Yunanistan",
+  "Honduras":"Honduras","Hong Kong":"Hong Kong","Hungary":"Macaristan",
+  "Iceland":"İzlanda","India":"Hindistan","Indonesia":"Endonezya",
+  "Iran":"İran","Iraq":"Irak","Ireland":"İrlanda","Israel":"İsrail",
+  "Italy":"İtalya","Jamaica":"Jamaika","Japan":"Japonya","Jordan":"Ürdün",
+  "Kazakhstan":"Kazakistan","Kenya":"Kenya","Kuwait":"Kuveyt",
+  "Kyrgyzstan":"Kırgızistan","Laos":"Laos","Latvia":"Letonya",
+  "Lebanon":"Lübnan","Libya":"Libya","Lithuania":"Litvanya",
+  "Luxembourg":"Lüksemburg","Malaysia":"Malezya","Malta":"Malta",
+  "Mexico":"Meksika","Moldova":"Moldova","Mongolia":"Moğolistan",
+  "Montenegro":"Karadağ","Morocco":"Fas","Mozambique":"Mozambik",
+  "Myanmar":"Myanmar","Namibia":"Namibya","Nepal":"Nepal",
+  "Netherlands":"Hollanda","New Zealand":"Yeni Zelanda","Nicaragua":"Nikaragua",
+  "Nigeria":"Nijerya","North Korea":"Kuzey Kore","Norway":"Norveç",
+  "Oman":"Umman","Pakistan":"Pakistan","Palestine":"Filistin",
+  "Panama":"Panama","Paraguay":"Paraguay","Peru":"Peru",
+  "Philippines":"Filipinler","Poland":"Polonya","Portugal":"Portekiz",
+  "Qatar":"Katar","Romania":"Romanya","Russia":"Rusya",
+  "Saudi Arabia":"Suudi Arabistan","Senegal":"Senegal","Serbia":"Sırbistan",
+  "Singapore":"Singapur","Slovakia":"Slovakya","Slovenia":"Slovenya",
+  "Somalia":"Somali","South Africa":"Güney Afrika","South Korea":"Güney Kore",
+  "Spain":"İspanya","Sri Lanka":"Sri Lanka","Sudan":"Sudan",
+  "Sweden":"İsveç","Switzerland":"İsviçre","Syria":"Suriye",
+  "Taiwan":"Tayvan","Tajikistan":"Tacikistan","Tanzania":"Tanzanya",
+  "Thailand":"Tayland","Tunisia":"Tunus","Turkey":"Türkiye",
+  "Turkmenistan":"Türkmenistan","UAE":"BAE","Uganda":"Uganda",
+  "Ukraine":"Ukrayna","United Kingdom":"Birleşik Krallık",
+  "United States":"Amerika Birleşik Devletleri","Uruguay":"Uruguay",
+  "USA":"Amerika Birleşik Devletleri","UK":"Birleşik Krallık",
+  "Uzbekistan":"Özbekistan","Venezuela":"Venezuela","Vietnam":"Vietnam",
+  "Yemen":"Yemen","Zambia":"Zambiya","Zimbabwe":"Zimbabve",
+  "Worldwide":"Dünya Geneli","Europe":"Avrupa","Asia":"Asya",
+  "Middle East":"Orta Doğu","Africa":"Afrika","Latin America":"Latin Amerika",
+  "NATO (Multiple)":"NATO (Çoklu)","South Asia":"Güney Asya",
+  "Southeast Asia":"Güneydoğu Asya","East Asia":"Doğu Asya",
+  "Eastern Europe":"Doğu Avrupa","Western Europe":"Batı Avrupa",
+  "Central Asia and Africa":"Orta Asya ve Afrika",
+  "Europe and Asia":"Avrupa ve Asya","Europe and North America":"Avrupa ve Kuzey Amerika",
+  "USA and Europe":"ABD ve Avrupa","USA and Worldwide":"ABD ve Dünya Geneli",
+  "Ukraine and Europe":"Ukrayna ve Avrupa",
+};
+
+const SECTOR_TR = {
+  "Aerospace":"Havacılık & Uzay",
+  "Automotive":"Otomotiv",
+  "Aviation":"Havayolu",
+  "Business-to-business IT service providers":"B2B BT Hizmet Sağlayıcıları",
+  "Casinos":"Kumarhaneler",
+  "Chemical":"Kimya",
+  "Citizens":"Vatandaşlar",
+  "Civil society groups":"Sivil Toplum Kuruluşları",
+  "Construction":"İnşaat",
+  "Critical infrastructure":"Kritik Altyapı",
+  "Defense":"Savunma Sanayii",
+  "Education":"Eğitim",
+  "Embassies":"Büyükelçilikler",
+  "Energy":"Enerji",
+  "Engineering":"Mühendislik",
+  "Entertainment":"Eğlence & Medya",
+  "Finance":"Finans & Bankacılık",
+  "Food":"Gıda",
+  "Foreign embassies":"Yabancı Büyükelçilikler",
+  "Gaming":"Oyun & Eğlence",
+  "Global companies with strategic importance to countries that are contrary to Iranian interests":"Stratejik Öneme Sahip Şirketler",
+  "Government":"Kamu & Devlet",
+  "Healthcare":"Sağlık",
+  "Hospitality":"Konaklama & Turizm",
+  "Industrial":"Endüstriyel",
+  "Influencers":"Influencer & Sosyal Medya",
+  "Law enforcement":"Kolluk Kuvvetleri",
+  "Manufacturing":"Üretim & İmalat",
+  "Maritime":"Denizcilik",
+  "Media":"Medya & Basın",
+  "Mining":"Madencilik",
+  "NGO":"STK & Sivil Toplum",
+  "Non-profit organizations":"Kar Amacı Gütmeyen Kuruluşlar",
+  "Oil & Gas":"Petrol & Doğalgaz",
+  "Online video game companies":"Online Oyun Şirketleri",
+  "Persian-speaking individuals":"Farsça Konuşan Bireyler",
+  "Political":"Siyasi",
+  "Research":"Araştırma & Akademi",
+  "Retail":"Perakende",
+  "Satellites":"Uydu & Uzay",
+  "Shipping":"Kargo & Nakliye",
+  "Technology":"Teknoloji & Yazılım",
+  "Telecom":"Telekomünikasyon",
+  "Think Tanks":"Düşünce Kuruluşları",
+  "Those involved in humanitarian aid":"İnsani Yardım Kuruluşları",
+  "Tibetan":"Tibet İlişkili Kuruluşlar",
+  "Transportation":"Ulaşım & Lojistik",
+  "Utilities":"Kamu Hizmetleri",
+  "economic":"Ekonomi & Ticaret",
+  "journalists":"Gazetecilik & Medya",
+};
+
+const CONFIDENCE_TR = { high:"Yüksek", medium:"Orta", low:"Düşük" };
+const TYPE_TR = { ip:"IP Adresi", domain:"Domain", sha256:"SHA256", sha1:"SHA1", md5:"MD5", url:"URL" };
+
+// tr* fonksiyonları toggleLang bloğunda tanımlı
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let APT_DATA = [];
+let IOC_DATA = [];
+let filteredIOCs = [];
+let currentPage = 1;
+const PAGE_SIZE = 50;
+let searchResults = [];
+
+// ════════════════════════════════════════════════════════
+// INIT — JSON LOAD
+// ════════════════════════════════════════════════════════
+async function loadData() {
+  try {
+    const aptRes = await fetch('apt_groups.json');
+    if (!aptRes.ok) throw new Error('apt_groups.json: HTTP ' + aptRes.status);
+    const aptJson = await aptRes.json();
+
+    const iocRes = await fetch('iocs_merged.json');
+    if (!iocRes.ok) throw new Error('iocs_merged.json: HTTP ' + iocRes.status);
+    const iocJson = await iocRes.json();
+
+    APT_DATA = aptJson.groups || aptJson;
+
+    // confidence bos string olanları normalize et
+    const rawIocs = iocJson.iocs || iocJson;
+    IOC_DATA = rawIocs.map(ioc => ({
+      ...ioc,
+      confidence: (ioc.confidence && ioc.confidence !== '') ? ioc.confidence : 'high'
+    }));
+
+    console.log('Yuklendi: ' + APT_DATA.length + ' APT, ' + IOC_DATA.length + ' IOC');
+    buildDropdowns();
+    buildIOCFilters();
+    filteredIOCs = [...IOC_DATA];
+    renderIOCTable();
+
+  } catch(e) {
+    console.error('Veri yukleme hatasi:', e.message);
+    const loader = document.getElementById('data-loader');
+    if (loader) loader.innerHTML = '<span style="color:#e74c3c">Hata: ' + e.message + '</span>';
+    APT_DATA = SAMPLE_APT;
+    IOC_DATA = SAMPLE_IOC;
+    buildDropdowns();
+    buildIOCFilters();
+    filteredIOCs = [...IOC_DATA];
+    renderIOCTable();
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// DROPDOWNS
+// ════════════════════════════════════════════════════════
+// Gerçek ülke adları listesi — sadece bunlar dropdown'a girer
+const REAL_COUNTRIES = new Set([
+  'Afghanistan','Albania','Algeria','Angola','Antigua and Barbuda','Argentina','Armenia',
+  'ASEAN','Asia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh',
+  'Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia',
+  'Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso',
+  'Cambodia','Cameroon','Canada','Central-African Republic','Chad','Chile','China',
+  'Colombia','Commonwealth of Independent States (CIS)','Congo','Costa Rica',
+  "Cote d'Ivoire",'Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti',
+  'Dominican Republic','Dubai','Ecuador','Egypt','El Salvador','Equatorial Guinea',
+  'Estonia','Ethiopia','Europe','Fiji','Finland','France','Gabon','Georgia','Germany',
+  'Ghana','Gibraltar','Greece','Guatemala','Guinea','Guyana','Honduras','Hong Kong',
+  'Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy',
+  'Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kuwait','Kyrgyzstan','Laos',
+  'Latin America','Latvia','Lebanon','Libya','Lithuania','Luxembourg','Macao',
+  'Macedonia','Madagascar','Malaysia','Maldives','Mali','Malta','Mauritania',
+  'Mauritius','Mexico','Middle East','Moldova','Monaco','Mongolia','Montenegro',
+  'Morocco','Mozambique','Myanmar','Namibia','Nepal','Netherlands','New Zealand',
+  'Nicaragua','Niger','Nigeria','North Korea','Norway','Oman','Pakistan','Palestine',
+  'Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal',
+  'Qatar','Romania','Russia','Rwanda','Saudi Arabia','Senegal','Serbia','Seychelles',
+  'Sierra Leone','Singapore','Slovakia','Slovenia','Somalia','South Africa',
+  'South Korea','Spain','Sri Lanka','Sudan','Suriname','Swaziland','Sweden',
+  'Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Tibet',
+  'Togo','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','UAE',
+  'Uganda','Ukraine','United Kingdom','United States','Uruguay','Uzbekistan',
+  'Venezuela','Vietnam','Worldwide','Yemen','Zambia','Zimbabwe',
+  'South Asia','Southeast Asia','East Asia','Eastern Europe','Western Europe',
+  'Central Asia','North Korea','Africa','NATO'
+]);
+
+// Bir APT grubunun target_countries'inde seçilen ülke var mı kontrol et
+function countryMatches(targetCountries, selected) {
+  for (const tc of targetCountries) {
+    if (tc === selected) return true;
+    // Composite içinde geçiyor mu? "Russia and CIS" → Russia seçilince yakala
+    if (tc.includes(' and ')) {
+      const parts = tc.split(' and ').map(p => p.replace(/[()]/g,'').trim());
+      if (parts.includes(selected)) return true;
+    }
+  }
+  return false;
+}
+
+function buildDropdowns() {
+  // Sadece REAL_COUNTRIES içindeki, veri setinde geçen ülkeleri al
+  const usedRaw = new Set(APT_DATA.flatMap(g => g.target_countries || []).filter(Boolean));
+
+  // Her ham girişten hangi gerçek ülkeler çıkıyor?
+  const usedReal = new Set();
+  for (const raw of usedRaw) {
+    if (REAL_COUNTRIES.has(raw)) {
+      usedReal.add(raw);
+    } else if (raw.includes(' and ')) {
+      const parts = raw.split(' and ').map(p => p.replace(/[()]/g,'').trim());
+      for (const p of parts) {
+        if (REAL_COUNTRIES.has(p)) usedReal.add(p);
+      }
+    }
+  }
+
+  const countries = [...usedReal].sort((a, b) => {
+    if (a === 'Turkey') return -1;
+    if (b === 'Turkey') return 1;
+    return trCountry(a).localeCompare(trCountry(b), 'tr');
+  });
+
+  // Çok uzun açıklamalı sektörleri kısa isimlerine çevirerek filtrele
+  const rawSectors = [...new Set(APT_DATA.flatMap(g => g.target_sectors || []))].filter(Boolean);
+  const sectors = rawSectors.sort((a, b) => trSector(a).localeCompare(trSector(b), 'tr'));
+
+  const cSel = document.getElementById('sel-country');
+  const sSel = document.getElementById('sel-sector');
+  while (cSel.options.length > 1) cSel.remove(1);
+  while (sSel.options.length > 1) sSel.remove(1);
+
+  countries.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = trCountry(v);
+    cSel.appendChild(o);
+  });
+  sectors.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = trSector(v);
+    sSel.appendChild(o);
+  });
+}
+
+function buildIOCFilters() {
+  const apts = [...new Set(IOC_DATA.map(i => i.apt_name))].filter(Boolean).sort();
+  const fApt = document.getElementById('f-apt');
+  apts.forEach(a => {
+    const o = document.createElement('option');
+    o.value = a; o.textContent = a;
+    fApt.appendChild(o);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════════════════
+function runSearch() {
+  const country = document.getElementById('sel-country').value;
+  const sector  = document.getElementById('sel-sector').value;
+  if (!country && !sector) {
+    document.getElementById('sel-country').style.borderColor = 'var(--accent)';
+    setTimeout(() => document.getElementById('sel-country').style.borderColor = '', 1500);
+    return;
+  }
+
+  const results = APT_DATA.filter(g => {
+    const mc = !country || countryMatches(g.target_countries || [], country);
+    const ms = !sector  || (g.target_sectors || []).includes(sector);
+    return mc && ms;
+  });
+
+  searchResults = results;
+
+  const heroEl = document.getElementById('home-hero');
+  const resEl  = document.getElementById('results-section');
+  const emptyEl= document.getElementById('empty-state');
+
+  if (results.length === 0) {
+    heroEl.style.paddingBottom = '1rem';
+    resEl.style.display  = 'none';
+    emptyEl.style.display = 'block';
+    emptyEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  resEl.style.display = 'block';
+
+  const selCountry = country ? trCountry(country) : null;
+  const selSector  = sector  ? trSector(sector)   : null;
+  const parts = [selCountry, selSector].filter(Boolean);
+  document.getElementById('results-count').innerHTML =
+    `<strong>${results.length}</strong> APT grubu tespit edildi
+     ${parts.length ? `— <em style="color:var(--text3)">${parts.join(' / ')}</em>` : ''}`;
+
+  const list = document.getElementById('apt-list');
+  list.innerHTML = '';
+
+  results.forEach((apt, i) => {
+    const iocCount = IOC_DATA.filter(ioc => ioc.apt_id === apt.id || ioc.apt_name === apt.name).length;
+    const card = buildAptCard(apt, iocCount, i);
+    list.appendChild(card);
+  });
+
+  resEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildAptCard(apt, iocCount, idx) {
+  const div = document.createElement('div');
+  div.className = 'apt-card';
+  div.style.animationDelay = (idx * 0.06) + 's';
+
+  const origin  = apt.country_of_origin || 'Bilinmiyor';
+  const sectors = (apt.target_sectors || []).slice(0, 5).map(trSector).join(', ');
+  const techniques = (apt.mitre_techniques || []).slice(0, 6);
+  const tactics    = (apt.mitre_tactics    || []).slice(0, 4);
+
+  // Tehdit seviyesi — köken ülkeden hesapla
+  const threatMap = { 'Russia':'CRITICAL','China':'CRITICAL','North Korea':'CRITICAL',
+                      'Iran':'HIGH','Pakistan':'HIGH','India':'MEDIUM' };
+  const threat = threatMap[apt.country_of_origin] || 'MEDIUM';
+  const threatTR = { CRITICAL: t('threat_CRITICAL'), HIGH: t('threat_HIGH'), MEDIUM: t('threat_MEDIUM') };
+
+  const aliases = (apt.aliases || []).slice(0, 4).join(' · ');
+  const desc = apt.description
+    ? apt.description.slice(0, 220) + (apt.description.length > 220 ? '...' : '')
+    : 'Açıklama mevcut değil.';
+
+  div.innerHTML = `
+    <div class="apt-card-head">
+      <div>
+        <div class="apt-card-name">${esc(apt.name)}</div>
+        ${aliases ? `<div class="apt-card-alias">${esc(aliases)}</div>` : ''}
+      </div>
+      <span class="threat-badge threat-${threat}">${threatTR[threat]}</span>
+    </div>
+    <p class="apt-card-desc">${esc(desc)}</p>
+    <div class="apt-meta">
+      <span class="tag origin">🌍 ${esc(origin)}</span>
+      ${apt.first_seen ? `<span class="tag">📅 ${esc(apt.first_seen)}</span>` : ''}
+      ${apt.sponsor ? `<span class="tag">🏛 ${esc(apt.sponsor)}</span>` : ''}
+    </div>
+    ${sectors ? `
+    <div class="apt-meta" style="margin-top:-4px">
+      ${(apt.target_sectors||[]).slice(0,5).map(s => `<span class="tag sector">${esc(trSector(s))}</span>`).join('')}
+    </div>` : ''}
+    ${techniques.length ? `
+    <div class="apt-techniques">
+      <div class="techniques-label">${LANG==='tr'?'MITRE ATT&CK Teknikleri':'MITRE ATT&CK Techniques'}</div>
+      <div class="technique-pills">
+        ${techniques.map(t => `<span class="technique-pill">${esc(t)}</span>`).join('')}
+        ${tactics.map(t => `<span class="technique-pill" style="background:var(--accent-bg);color:var(--accent)">${esc(t)}</span>`).join('')}
+      </div>
+    </div>` : ''}
+    <div class="apt-card-foot">
+      <span class="apt-ioc-count">${t('ioc_count_label')} <strong>${iocCount}</strong> ${LANG==='tr'?'kayıt':'records'}</span>
+      ${apt.mitre_url ? `<a class="apt-mitre-link" href="${apt.mitre_url}" target="_blank">MITRE ATT&CK ↗</a>` : ''}
+    </div>
+  `;
+  return div;
+}
+
+// ════════════════════════════════════════════════════════
+// IOC TABLE
+// ════════════════════════════════════════════════════════
+function applyFilters() {
+  const fType   = document.getElementById('f-type').value;
+  const fApt    = document.getElementById('f-apt').value;
+  const fConf   = document.getElementById('f-conf').value;
+  const fSearch = document.getElementById('f-search').value.toLowerCase().trim();
+
+  filteredIOCs = IOC_DATA.filter(ioc => {
+    if (fType   && ioc.type       !== fType)   return false;
+    if (fApt    && ioc.apt_name   !== fApt)    return false;
+    if (fConf   && ioc.confidence !== fConf)   return false;
+    if (fSearch && !ioc.value.toLowerCase().includes(fSearch) &&
+        !(ioc.apt_name||'').toLowerCase().includes(fSearch)) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  renderIOCTable();
+}
+
+function resetFilters() {
+  document.getElementById('f-type').value   = '';
+  document.getElementById('f-apt').value    = '';
+  document.getElementById('f-conf').value   = '';
+  document.getElementById('f-search').value = '';
+  filteredIOCs = [...IOC_DATA];
+  currentPage = 1;
+  renderIOCTable();
+}
+
+function renderIOCTable() {
+  const tbody = document.getElementById('ioc-tbody');
+  const total = filteredIOCs.length;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end   = Math.min(start + PAGE_SIZE, total);
+  const page  = filteredIOCs.slice(start, end);
+
+  // Stats
+  const typeCounts = {};
+  filteredIOCs.forEach(i => { typeCounts[i.type] = (typeCounts[i.type]||0)+1; });
+  document.getElementById('ioc-stats').innerHTML =
+    `<span class="ioc-stat"><strong>${total.toLocaleString('tr')}</strong> IOC</span>` +
+    Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).map(([t,c]) =>
+      `<span class="ioc-stat"><strong>${c.toLocaleString('tr')}</strong> ${trType(t)}</span>`
+    ).join('');
+
+  if (page.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="no-results">${LANG==='tr'?'Eşleşen IOC bulunamadı.':'No matching IOCs found.'}</div></td></tr>`;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = page.map(ioc => `
+    <tr>
+      <td><span class="ioc-type-badge type-${ioc.type}">${trType(ioc.type)}</span></td>
+      <td><div class="ioc-value">${esc(ioc.value_defanged || ioc.value)}</div></td>
+      <td><span class="ioc-apt">${esc(ioc.apt_name||'—')}</span></td>
+      <td><span class="conf-badge conf-${ioc.confidence||'medium'}">${trConf(ioc.confidence||'medium').toUpperCase()}</span></td>
+      <td style="font-size:0.72rem;color:var(--text3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+          title="${esc(ioc.source||'')}">
+        ${esc((ioc.source||'').replace(/-repo/g,'').replace(/APTMalware/g,'APTMalware'))}
+      </td>
+      <td>
+        <button class="copy-btn" onclick="copyVal(this,'${escAttr(ioc.value)}')">${t('copy')}</button>
+      </td>
+    </tr>
+  `).join('');
+
+  renderPagination(total);
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / PAGE_SIZE);
+  if (pages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+
+  const start = (currentPage-1)*PAGE_SIZE+1;
+  const end   = Math.min(currentPage*PAGE_SIZE, total);
+
+  let btns = '';
+  const maxBtns = 7;
+  let s = Math.max(1, currentPage-3), e = Math.min(pages, s+maxBtns-1);
+  if (e-s < maxBtns-1) s = Math.max(1, e-maxBtns+1);
+
+  for (let p=s; p<=e; p++) {
+    btns += `<button class="pag-btn${p===currentPage?' active':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+
+  document.getElementById('pagination').innerHTML = `
+    <span class="pagination-info">${start.toLocaleString('tr')}–${end.toLocaleString('tr')} / ${total.toLocaleString('tr')} kayıt</span>
+    <div class="pagination-btns">
+      <button class="pag-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>
+      ${btns}
+      <button class="pag-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>
+    </div>
+  `;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filteredIOCs.length / PAGE_SIZE);
+  if (p < 1 || p > pages) return;
+  currentPage = p;
+  renderIOCTable();
+  document.querySelector('.ioc-table-wrap').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════════════════════════
+function exportIOC(format) {
+  const data = filteredIOCs;
+  if (data.length === 0) { alert('Dışa aktarılacak IOC bulunamadı.'); return; }
+
+  if (format === 'txt') {
+    const lines = [
+      '# BenMiHedef — IOC Export',
+      `# Tarih: ${new Date().toLocaleString('tr-TR')}`,
+      `# Toplam: ${data.length} IOC`,
+      '',
+      '# TÜR | DEĞER | APT GRUBU | GÜVENİLİRLİK | KAYNAK',
+      ...data.map(i => `${i.type.toUpperCase()} | ${i.value} | ${i.apt_name||''} | ${trConf(i.confidence||'medium')} | ${i.source||''}`)
+    ];
+    download('ioc_export.txt', lines.join('\n'));
+  } else {
+    const header = 'Tür,Değer,APT Grubu,Güvenilirlik,Kaynak,Malware Ailesi';
+    const rows = data.map(i =>
+      [i.type, i.value, i.apt_name||'', trConf(i.confidence||'medium'), i.source||'', i.malware_family||''].map(csvCell).join(',')
+    );
+    download('ioc_export.csv', [header, ...rows].join('\n'));
+  }
+}
+
+function exportResultsIOC() {
+  if (!searchResults.length) { alert('Önce arama yapın.'); return; }
+  const aptIds   = new Set(searchResults.map(g => g.id));
+  const aptNames = new Set(searchResults.map(g => g.name));
+  const matched  = IOC_DATA.filter(ioc => aptIds.has(ioc.apt_id) || aptNames.has(ioc.apt_name));
+
+  if (matched.length === 0) {
+    alert('Bulunan APT gruplarına ait IOC verisi bulunamadı.');
+    return;
+  }
+
+  const country = document.getElementById('sel-country').value;
+  const sector  = document.getElementById('sel-sector').value;
+  const parts   = [country ? trCountry(country) : null, sector ? trSector(sector) : null].filter(Boolean);
+
+  const lines = [
+    '# BenMiHedef — Hedef IOC Export',
+    `# Sorgu: ${parts.join(' / ')}`,
+    `# Tarih: ${new Date().toLocaleString('tr-TR')}`,
+    `# ${searchResults.length} APT grubu — ${matched.length} IOC`,
+    '',
+    '# === APT GRUPLARI ===',
+    ...searchResults.map(g => `# ${g.name} (${g.country_of_origin||'?'})`),
+    '',
+    '# === IOC LİSTESİ ===',
+    '# TÜR | DEĞER | APT GRUBU | GÜVENİLİRLİK',
+    ...matched.map(i => `${i.type.toUpperCase()} | ${i.value} | ${i.apt_name||''} | ${trConf(i.confidence||'medium')}`)
+  ];
+
+  const fname = `hedef_ioc_${(parts.join('_')||'export').replace(/\s/g,'_').toLowerCase()}.txt`;
+  download(fname, lines.join('\n'));
+}
+
+function download(filename, content) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type:'text/plain;charset=utf-8' }));
+  a.download = filename;
+  a.click();
+}
+
+function csvCell(v) {
+  const s = String(v);
+  return (s.includes(',') || s.includes('"') || s.includes('\n'))
+    ? `"${s.replace(/"/g,'""')}"`
+    : s;
+}
+
+// ════════════════════════════════════════════════════════
+// COPY
+// ════════════════════════════════════════════════════════
+function copyVal(btn, val) {
+  const clean = val.replace(/\[\.\]/g,'.').replace(/\[:\]/g,':');
+  navigator.clipboard.writeText(clean).then(() => {
+    btn.textContent = t('copied');
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopyala'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// NAV & THEME
+// ════════════════════════════════════════════════════════
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════
+// LANGUAGE SWITCH
+// ════════════════════════════════════════════════════════
+let LANG = 'tr'; // 'tr' | 'en'
+
+const I18N = {
+  tr: {
+    nav_home: 'Hedef Ben Miyim?',
+    nav_ioc:  'IOC Veritabanı',
+    home_title: 'Hedef Ben Miyim?',
+    home_sub: 'Sektörünü ve ülkeni seç, seni hedef alan APT gruplarını öğren.',
+    sel_country: '— Ülke Seçin —',
+    sel_sector:  '— Sektör Seçin —',
+    label_country: 'Ülke',
+    label_sector:  'Sektör',
+    search_btn: 'Hedef Ben Miyim, Tayfun?',
+    export_results: '\u2193 Hedef IOC Listesini D\u0131\u015fa Aktar',
+    ioc_page_title: 'IOC Veritabanı',
+    ioc_page_sub: 'Bilinen APT gruplarına ait göstergeler — IP, domain, hash değerleri',
+    conf_legend_title: 'Güvenilirlik Seviyeleri',
+    conf_high_desc: 'FireEye/Mandiant, Kaspersky, Palo Alto Unit42 gibi kurumsal kaynaklardan doğrulanmış IOCler',
+    conf_med_desc: 'Topluluk tarafından paylaşılan, doğrulanmış güvenlik araştırmacı repolarından alınan IOCler',
+    conf_low_desc: 'Otomatik feedlerden veya doğrulanmamış kaynaklardan gelen IOCler',
+    f_type_all: 'Tümü', f_apt_all: 'Tümü', f_conf_all: 'Tümü',
+    f_type_label: 'IOC Türü', f_apt_label: 'APT Grubu', f_conf_label: 'Güvenilirlik',
+    f_search_ph: 'IP, domain veya hash ara...',
+    btn_reset: 'Sıfırla',
+    results_apt: (n) => `<strong>${n}</strong> APT grubu tespit edildi`,
+    no_results_title: 'Eşleşen tehdit grubu bulunamadı',
+    no_results_sub: 'Bu ülke ve sektör kombinasyonu için kayıtlı APT grubu yok.',
+    copy: 'Kopyala', copied: '✓ Kopyalandı',
+    ioc_count_label: 'IOC:',
+    threat_CRITICAL: 'KRİTİK', threat_HIGH: 'YÜKSEK', threat_MEDIUM: 'ORTA',
+    conf_HIGH: 'YÜKSEK', conf_MEDIUM: 'ORTA', conf_LOW: 'DÜŞÜK',
+    type_ip: 'IP Adresi', type_domain: 'Domain', type_sha256: 'SHA256',
+    type_sha1: 'SHA1', type_md5: 'MD5', type_url: 'URL',
+    loading: 'Veriler yükleniyor...',
+    dev_by: 'Developed by',
+  },
+  en: {
+    nav_home: 'Am I a Target?',
+    nav_ioc:  'IOC Database',
+    home_title: 'Am I a Target?',
+    home_sub: 'Select your country and sector to find APT groups targeting you.',
+    sel_country: '— Select Country —',
+    sel_sector:  '— Select Sector —',
+    label_country: 'Country',
+    label_sector:  'Sector',
+    search_btn: 'Am I a Target, Tayfun?',
+    export_results: '↓ Export Target IOCs',
+    ioc_page_title: 'IOC Database',
+    ioc_page_sub: 'Indicators of compromise from known APT groups — IPs, domains, hashes',
+    conf_legend_title: 'Confidence Levels',
+    conf_high_desc: 'Verified IOCs from enterprise sources like FireEye/Mandiant, Kaspersky, Palo Alto Unit42',
+    conf_med_desc: 'Community-shared IOCs from verified security researcher repositories',
+    conf_low_desc: 'IOCs from automated feeds or unverified sources',
+    f_type_all: 'All', f_apt_all: 'All', f_conf_all: 'All',
+    f_type_label: 'IOC Type', f_apt_label: 'APT Group', f_conf_label: 'Confidence',
+    f_search_ph: 'Search IP, domain or hash...',
+    btn_reset: 'Reset',
+    results_apt: (n) => `<strong>${n}</strong> APT groups detected`,
+    no_results_title: 'No matching threat groups found',
+    no_results_sub: 'No APT groups recorded for this country and sector combination.',
+    copy: 'Copy', copied: '✓ Copied',
+    ioc_count_label: 'IOCs:',
+    threat_CRITICAL: 'CRITICAL', threat_HIGH: 'HIGH', threat_MEDIUM: 'MEDIUM',
+    conf_HIGH: 'HIGH', conf_MEDIUM: 'MEDIUM', conf_LOW: 'LOW',
+    type_ip: 'IP Address', type_domain: 'Domain', type_sha256: 'SHA256',
+    type_sha1: 'SHA1', type_md5: 'MD5', type_url: 'URL',
+    loading: 'Loading data...',
+    dev_by: 'Developed by',
+  }
+};
+
+function t(key, ...args) {
+  const val = I18N[LANG][key];
+  return typeof val === 'function' ? val(...args) : (val || I18N['tr'][key] || key);
+}
+
+function trCountry(v) { return LANG === 'tr' ? (COUNTRY_TR[v] || v) : v; }
+function trSector(v)  {
+  if (LANG === 'tr') return SECTOR_TR[v] || v;
+  return SECTOR_EN_DISPLAY[v] || v;
+}
+function trConf(v)    { return LANG === 'tr' ? (CONFIDENCE_TR[v] || v) : (v ? v.charAt(0).toUpperCase() + v.slice(1) : v); }
+function trType(v)    { return LANG === 'tr' ? (TYPE_TR[v] || v.toUpperCase()) : (TYPE_TR_EN[v] || v.toUpperCase()); }
+
+const TYPE_TR_EN = { ip:'IP Address', domain:'Domain', sha256:'SHA256', sha1:'SHA1', md5:'MD5', url:'URL' };
+
+const SECTOR_EN_DISPLAY = {
+  "economic": "Economic",
+  "journalists": "Journalism",
+  "Foreign embassies in Belarus": "Foreign Embassies (Belarus)",
+  "Global companies with strategic importance to countries that are contrary to Iranian interests": "Strategic Companies (Iran-related)",
+  "Persian-speaking individuals": "Persian-speaking Individuals",
+  "Those involved in humanitarian aid": "Humanitarian Aid",
+  "Tibetan": "Tibetan Organizations",
+  "Civil society groups": "Civil Society",
+  "Non-profit organizations": "Non-profit Organizations",
+  "Online video game companies": "Online Gaming Companies",
+  "Business-to-business IT service providers": "B2B IT Providers",
+  "Critical infrastructure": "Critical Infrastructure",
+  "Law enforcement": "Law Enforcement",
+  "Think Tanks": "Think Tanks",
+  "Oil & Gas": "Oil & Gas",
+};
+
+function toggleLang() {
+  LANG = LANG === 'tr' ? 'en' : 'tr';
+  const btn = document.getElementById('langBtn');
+  if (LANG === 'en') {
+    btn.innerHTML = '<span>🇹🇷</span> TR';
+  } else {
+    btn.innerHTML = '<span>🇬🇧</span> EN';
+  }
+  applyLang();
+  // Dropdown'ları yeniden oluştur
+  buildDropdowns();
+  buildIOCFilters();
+  // IOC tablosunu yenile
+  renderIOCTable();
+}
+
+function applyLang() {
+  // Nav
+  document.querySelectorAll('.nav-link')[0].textContent = t('nav_home');
+  document.querySelectorAll('.nav-link')[1].textContent = t('nav_ioc');
+  // Home
+  document.querySelector('.home-title').textContent = t('home_title');
+  document.querySelector('.home-sub').textContent   = t('home_sub');
+  document.querySelector('#sel-country option[value=""]') && (document.querySelector('#sel-country option[value=""]').textContent = t('sel_country'));
+  document.querySelector('#sel-sector option[value=""]') && (document.querySelector('#sel-sector option[value=""]').textContent = t('sel_sector'));
+  document.querySelector('.select-label') && (document.querySelectorAll('.select-label')[0].textContent = t('label_country'));
+  document.querySelectorAll('.select-label')[1] && (document.querySelectorAll('.select-label')[1].textContent = t('label_sector'));
+  document.querySelector('.search-btn').textContent = t('search_btn');
+  // Export results btn
+  const expBtn = document.querySelector('.export-results-btn');
+  if (expBtn) expBtn.textContent = t('export_results');
+  // IOC page
+  document.querySelector('.page-title') && (document.querySelector('.page-title').textContent = t('ioc_page_title'));
+  document.querySelector('.page-sub')   && (document.querySelector('.page-sub').textContent   = t('ioc_page_sub'));
+  // Conf legend
+  const confTitle = document.querySelector('.conf-legend-title');
+  if (confTitle) confTitle.textContent = t('conf_legend_title');
+  const confDescs = document.querySelectorAll('.conf-desc');
+  if (confDescs[0]) confDescs[0].textContent = t('conf_high_desc');
+  if (confDescs[1]) confDescs[1].textContent = t('conf_med_desc');
+  if (confDescs[2]) confDescs[2].textContent = t('conf_low_desc');
+  // Filter labels
+  const fLabels = document.querySelectorAll('.filter-label');
+  if (fLabels[0]) fLabels[0].textContent = t('f_type_label');
+  if (fLabels[1]) fLabels[1].textContent = t('f_apt_label');
+  if (fLabels[2]) fLabels[2].textContent = t('f_conf_label');
+  const fSearch = document.getElementById('f-search');
+  if (fSearch) fSearch.placeholder = t('f_search_ph');
+  // Reset btn
+  const resetBtn = document.querySelector('.btn-outline');
+  if (resetBtn) resetBtn.textContent = t('btn_reset');
+  // Loading
+  const loader = document.getElementById('data-loader');
+  if (loader && loader.querySelector('.loader-dot')) {
+    loader.innerHTML = '<div class="loader-dot"></div>' + t('loading');
+  }
+
+  // ── IOC sayfası statik elemanları ──
+  // Tablo başlıkları
+  const thMap = {
+    'th-type':   LANG==='tr'?'Tür':'Type',
+    'th-value':  LANG==='tr'?'Değer':'Value',
+    'th-apt':    LANG==='tr'?'APT Grubu':'APT Group',
+    'th-conf':   LANG==='tr'?'Güvenilirlik':'Confidence',
+    'th-source': LANG==='tr'?'Kaynak':'Source',
+  };
+  for (const [id, txt] of Object.entries(thMap)) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  }
+  // IOC Type filtre seçenekleri
+  const ftAll  = document.getElementById('fopt-all-type');
+  const ftIp   = document.getElementById('fopt-ip');
+  if (ftAll) ftAll.textContent = LANG==='tr'?'Tümü':'All';
+  if (ftIp)  ftIp.textContent  = LANG==='tr'?'IP Adresi':'IP Address';
+
+  // Confidence filtre seçenekleri
+  const fcAll = document.getElementById('fopt-all-conf');
+  const fcHi  = document.getElementById('fopt-high');
+  const fcMed = document.getElementById('fopt-med');
+  const fcLow = document.getElementById('fopt-low');
+  if (fcAll) fcAll.textContent = LANG==='tr'?'Tümü':'All';
+  if (fcHi)  fcHi.textContent  = LANG==='tr'?'Yüksek':'High';
+  if (fcMed) fcMed.textContent = LANG==='tr'?'Orta':'Medium';
+  if (fcLow) fcLow.textContent = LANG==='tr'?'Düşük':'Low';
+
+  // APT filtresi — "Tümü / All" ilk seçeneği
+  const fAptFirst = document.querySelector('#f-apt option[value=""]');
+  if (fAptFirst) fAptFirst.textContent = LANG==='tr'?'Tümü':'All';
+
+  // Confidence legend badge'leri
+  const bHigh = document.getElementById('badge-high');
+  const bMed  = document.getElementById('badge-medium');
+  const bLow  = document.getElementById('badge-low');
+  if (bHigh) bHigh.textContent = LANG==='tr'?'YÜKSEK':'HIGH';
+  if (bMed)  bMed.textContent  = LANG==='tr'?'ORTA':'MEDIUM';
+  if (bLow)  bLow.textContent  = LANG==='tr'?'DÜŞÜK':'LOW';
+
+  // Filtre label'ları
+  const fLabels2 = document.querySelectorAll('.filter-label');
+  const fLabelKeys = ['f_type_label','f_apt_label','f_conf_label'];
+  if (fLabels2.length >= 3) {
+    fLabelKeys.forEach((k,i) => { if(fLabels2[i]) fLabels2[i].textContent = t(k); });
+  }
+  // Arama placeholder — 4. filter-label sonrası input
+  const fsInp = document.getElementById('f-search');
+  if (fsInp) fsInp.placeholder = t('f_search_ph');
+  // 4. filter label "Değer Ara / Search Value"
+  if (fLabels2[3]) fLabels2[3].textContent = LANG==='tr'?'Değer Ara':'Search Value';
+
+  // IOC stats'ı yeniden render et (type isimlerini güncelle)
+  renderIOCTable();
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+  const track = document.getElementById('themeTrack');
+  const label = document.getElementById('themeLabel');
+  if (isDark) {
+    track.classList.remove('on');
+    label.textContent = 'Dark';
+  } else {
+    track.classList.add('on');
+    label.textContent = 'Dark';
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s||'').replace(/'/g,"\\'");
+}
+
+// ════════════════════════════════════════════════════════
+// SAMPLE DATA (JSON yüklenemezse fallback)
+// ════════════════════════════════════════════════════════
+const SAMPLE_APT = [
+  { id:"apt28", name:"APT 28, Fancy Bear", aliases:["Sofacy","STRONTIUM"], country_of_origin:"Russia",
+    target_countries:["Turkey","Germany","USA","Ukraine"], target_sectors:["Government","Defense","Media"],
+    description:"Rus GRU bağlantılı, NATO ülkelerini hedef alan gelişmiş tehdit aktörü.",
+    mitre_techniques:["T1566","T1078","T1059"], mitre_tactics:["Initial Access","Execution"],
+    mitre_url:"https://attack.mitre.org/groups/G0007/", first_seen:"2004" },
+  { id:"apt29", name:"APT 29, Cozy Bear", aliases:["Midnight Blizzard","Nobelium"], country_of_origin:"Russia",
+    target_countries:["Turkey","USA","UK","Germany"], target_sectors:["Government","Finance","Energy"],
+    description:"Rusya SVR bağlantılı, SolarWinds tedarik zinciri saldırısının failleri.",
+    mitre_techniques:["T1566","T1190","T1078"], mitre_tactics:["Initial Access","Persistence"],
+    mitre_url:"https://attack.mitre.org/groups/G0016/", first_seen:"2008" },
+];
+const SAMPLE_IOC = [
+  { type:"domain", value:"evil-update[.]com", value_defanged:"evil-update[.]com", apt_name:"APT 28, Fancy Bear", apt_id:"apt28", source:"Neo23x0/signature-base", confidence:"high", malware_family:"X-Agent" },
+  { type:"ip", value:"185.220.101[.]1", value_defanged:"185.220.101[.]1", apt_name:"APT 29, Cozy Bear", apt_id:"apt29", source:"APT_IOC-repo", confidence:"medium", malware_family:null },
+];
+
+// ════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════
+loadData();
+</script>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-dev">
+    <span>Developed by</span>
+    <strong>Berkan Türel</strong>
+  </div>
+  <div class="footer-links">
+    <a class="footer-link" href="https://berkanturel.com" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      berkanturel.com
+    </a>
+    <a class="footer-link" href="https://www.linkedin.com/in/berkan-t%C3%BCrel-87955b223/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/>
+        <circle cx="4" cy="4" r="2"/>
+      </svg>
+      LinkedIn
+    </a>
+  </div>
+</footer>
+
+<!-- Loading indicator -->
+<div id="data-loader">
+  <div class="loader-dot"></div>
+  Veriler yükleniyor...
+</div>
+
+</body>
+</html>
