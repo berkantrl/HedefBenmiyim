@@ -4861,7 +4861,7 @@
       "last_seen": null,
       "description": "( Kaspersky ) Ferocious Kitten is an APT group that has been active against Persian-speaking individuals since 2015 and appears to be based in Iran. Although it has been active over a large timespan, the group has mostly operated under the radar and, to the best of our knowledge, has not been covered by security researchers. It only recently attracted attention when a lure document was uploaded to VirusTotal and was brought to public knowledge by researchers on Twitter. Subsequently, one of its implants was analyzed by a Chinese intelligence firm. We have been able to expand some of the findings on the group and provide insights on additional variants. The malware dropped from the aforementioned document is dubbed MarkiRAT and is used to record keystrokes and clipboard content, provide fil",
       "target_sectors": [
-        "Persian-speaking individuals"
+        
       ],
       "target_countries": [],
       "tools_used": [
